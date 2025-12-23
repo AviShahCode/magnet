@@ -1,0 +1,29 @@
+use argon2::{
+    Argon2,
+    password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
+};
+fn main() -> anyhow::Result<()> {
+    let password = b"hunter42"; // Bad password; don't actually use!
+    let salt = SaltString::generate(&mut OsRng);
+    println!("{}", salt.to_string());
+
+    // Argon2 with default params (Argon2id v19)
+    let argon2 = Argon2::default();
+
+    // Hash password to PHC string ($argon2id$v=19$...)
+    let password_hash = argon2.hash_password(password, &salt).unwrap().to_string();
+    println!("{}", password_hash);
+
+    // Verify password against PHC string.
+    //
+    // NOTE: hash params from `parsed_hash` are used instead of what is configured in the
+    // `Argon2` instance.
+    let parsed_hash = PasswordHash::new(&password_hash).unwrap();
+    assert!(
+        Argon2::default()
+            .verify_password(password, &parsed_hash)
+            .is_ok()
+    );
+
+    Ok(())
+}

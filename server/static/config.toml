@@ -1,0 +1,7 @@
+[server]
+ip = "localhost"
+port = 7742
+
+[database]
+url = "postgres://magnetic:pA5sw0rD@localhost:5432/magnet"
+# max connections
