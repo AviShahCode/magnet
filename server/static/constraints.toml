@@ -1,0 +1,12 @@
+[username]
+min_length = 8
+max_length = 32
+pattern = "^[a-zA-Z0-9_]+$"
+
+[password]
+min_length = 8
+max_length = 64
+
+[session]
+duration = 2592000  # one month
+length = 16  # 16 bytes => 32 in hex

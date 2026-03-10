@@ -1,0 +1,12 @@
+[project]
+name = "magnet_client"
+version = "0.1.0"
+description = "Client GUI application for magnet server"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "maturin~=1.12.4",
+]
