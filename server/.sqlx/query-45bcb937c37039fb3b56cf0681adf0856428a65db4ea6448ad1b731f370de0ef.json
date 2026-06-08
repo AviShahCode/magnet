@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH RECURSIVE tree AS (\n            SELECT id, item_type\n            FROM drive.files\n            WHERE user_id = $1 AND id = $2\n\n            UNION ALL\n\n            SELECT f.id, f.item_type\n            FROM drive.files f\n            INNER JOIN tree t ON f.parent = t.id\n            WHERE f.user_id = $1\n        ),\n        deleted AS (\n            DELETE FROM drive.files\n            WHERE id IN (SELECT id FROM tree)\n            RETURNING id, item_type\n        )\n        SELECT id FROM deleted WHERE item_type = 'file';\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "drive.files",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "45bcb937c37039fb3b56cf0681adf0856428a65db4ea6448ad1b731f370de0ef"
+}

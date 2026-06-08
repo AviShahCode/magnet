@@ -1,0 +1,94 @@
+services:
+  apisix:
+    image: apache/apisix:3.16.0-debian
+    container_name: apisix
+    restart: unless-stopped
+    volumes:
+      - ./apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+      - ./apisix/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
+    ports:
+      - "${APISIX_PORT}:9080"
+    networks:
+      - magnet_network
+    depends_on:
+      - magnet
+
+  postgres:
+    image: postgres:17.9-alpine3.23
+    container_name: postgres
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init/postgres:/docker-entrypoint-initdb.d:ro
+    environment:
+      - POSTGRES_PASSWORD
+      - MAGNET_POSTGRES_PASSWORD
+      - MAGNET_ADMIN_USERNAME
+      - MAGNET_ADMIN_PASSWORD
+    ports:
+      - "5433:5432"
+    networks:
+      - magnet_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U magnetic -d magnet" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  redis:
+    image: redis:8.8-alpine3.23
+    container_name: redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --save ""
+      --appendonly no
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "7742:7742"
+    networks:
+      - magnet_network
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  magnet:
+    build:
+      context: ./server
+    container_name: magnet
+    restart: unless-stopped
+    volumes:
+      - magnet_data:${MAGNET_DATA_DIR}
+    environment:
+      - DATABASE_URL=postgres://magnetic:${MAGNET_POSTGRES_PASSWORD}@postgres:5432/magnet
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - MAGNET_DATA_DIR
+      - MAGNET_LISTEN_URL
+      - RUST_LOG
+    networks:
+      - magnet_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f ${MAGNET_LISTEN_URL}/ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  postgres_data:
+  magnet_data:
+
+networks:
+  magnet_network:
+    driver: bridge

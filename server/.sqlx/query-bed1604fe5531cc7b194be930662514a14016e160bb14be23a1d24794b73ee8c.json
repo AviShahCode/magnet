@@ -1,0 +1,63 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, name, item_type as \"item_type: ItemType\" FROM drive.files WHERE user_id = $1 AND (parent = $2 OR (parent IS NULL AND $2 IS NULL)) ORDER BY item_type, name",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "drive.files",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "drive.files",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "item_type: ItemType",
+        "type_info": {
+          "Custom": {
+            "name": "drive.item_type",
+            "kind": {
+              "Enum": [
+                "folder",
+                "file"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "drive.files",
+            "name": "item_type"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "bed1604fe5531cc7b194be930662514a14016e160bb14be23a1d24794b73ee8c"
+}

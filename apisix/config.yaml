@@ -1,0 +1,11 @@
+apisix:
+  enable_admin: false
+
+deployment:
+  role: data_plane
+  role_data_plane:
+    config_provider: yaml
+
+nginx_config:
+  worker_processes: 4
+  error_log_level: "warn"

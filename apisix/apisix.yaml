@@ -1,0 +1,23 @@
+#upstreams:
+#  - id: magnet_upstream
+#    type: roundrobin
+#    nodes:
+routes:
+  - id: api
+    uri: /*
+    upstream:
+      nodes:
+        magnet:7742: 1
+      type: roundrobin
+    plugins:
+      limit-count:
+        count: 60000
+        time_window: 3
+        rejected_code: 429
+        key: remote_addr
+      gzip:
+        types: ["application/json"]
+        min_length: 500
+        comp_level: 4
+
+#END

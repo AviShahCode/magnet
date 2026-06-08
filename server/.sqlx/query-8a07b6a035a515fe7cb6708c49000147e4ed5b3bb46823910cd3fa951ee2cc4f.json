@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT item_type AS \"item_type: ItemType\" FROM drive.files WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "item_type: ItemType",
+        "type_info": {
+          "Custom": {
+            "name": "drive.item_type",
+            "kind": {
+              "Enum": [
+                "folder",
+                "file"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "drive.files",
+            "name": "item_type"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "8a07b6a035a515fe7cb6708c49000147e4ed5b3bb46823910cd3fa951ee2cc4f"
+}

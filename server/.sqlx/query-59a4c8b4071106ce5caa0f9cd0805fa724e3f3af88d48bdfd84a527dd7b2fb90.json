@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO drive.files (id, name, user_id, item_type, parent) VALUES ($1, $2, $3, $4, $5)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bpchar",
+        "Varchar",
+        "Int4",
+        {
+          "Custom": {
+            "name": "drive.item_type",
+            "kind": {
+              "Enum": [
+                "folder",
+                "file"
+              ]
+            }
+          }
+        },
+        "Bpchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "59a4c8b4071106ce5caa0f9cd0805fa724e3f3af88d48bdfd84a527dd7b2fb90"
+}
