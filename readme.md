@@ -177,4 +177,4 @@ volumes:
 * **To enable RDB (Snapshotting):** Change `--save ""` to `--save 60 1` (This saves a snapshot every 60 seconds if at least 1 key changed).
 * **To enable AOF (Append Only File):** Change `--appendonly no` to `--appendonly yes`. (More durable, logs every write operation).
 
-3. **Add `redis_data:**` to the top-level `volumes:` block at the bottom of the compose file.
+3. Add `redis_data:` to the top-level `volumes:` block at the bottom of the compose file.
