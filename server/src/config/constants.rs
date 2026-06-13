@@ -5,6 +5,7 @@ pub struct Constants {
     pub username: UsernameConfig,
     pub password: PasswordConfig,
     pub session: SessionConfig,
+    pub signup: SignupConfig
 }
 
 #[derive(Deserialize, Clone)]
@@ -23,4 +24,9 @@ pub struct PasswordConfig {
 #[derive(Deserialize, Clone)]
 pub struct SessionConfig {
     pub duration: u64,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct SignupConfig {
+    pub code_duration: u64
 }

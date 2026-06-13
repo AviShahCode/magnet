@@ -30,21 +30,23 @@ CREATE TYPE drive.item_type AS ENUM ('folder', 'file');
 
 CREATE TABLE IF NOT EXISTS drive.files
 (
-    id        CHAR(32) PRIMARY KEY,
+    id        CHAR(22) PRIMARY KEY, -- 16 chars = 22 chars in base64 (no pad)
     name      VARCHAR(256)                                           NOT NULL,
     user_id   INTEGER REFERENCES public.users (id) ON DELETE CASCADE NOT NULL,
     item_type drive.item_type                                        NOT NULL,
-    parent    CHAR(32) REFERENCES drive.files (id) ON DELETE CASCADE
+    parent    CHAR(22) REFERENCES drive.files (id) ON DELETE CASCADE
 );
 
-CREATE TYPE drive.share_type AS ENUM ('read', 'write');
+-- CREATE TYPE drive.share_type AS ENUM ('read', 'write');
+--
+-- CREATE TABLE IF NOT EXISTS drive.share
+-- (
+--     file_id    CHAR(22) REFERENCES drive.files (id) ON DELETE CASCADE NOT NULL,
+--     to_user    INTEGER REFERENCES users (id) ON DELETE CASCADE        NOT NULL,
+--     share_type drive.share_type                                       NOT NULL,
+--     PRIMARY KEY (file_id, to_user)
+-- );
 
-CREATE TABLE IF NOT EXISTS drive.share
-(
-    file_id    CHAR(32) REFERENCES drive.files (id) ON DELETE CASCADE NOT NULL,
-    to_user    INTEGER REFERENCES users (id) ON DELETE CASCADE        NOT NULL,
-    share_type drive.share_type                                       NOT NULL,
-    PRIMARY KEY (file_id, to_user)
-);
-
-INSERT INTO roles VALUES (1, 'admin'), (2, 'user');
+INSERT INTO roles
+VALUES (1, 'admin'),
+       (2, 'user');

@@ -5,7 +5,7 @@ use std::fs;
 
 pub static DATA_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
     let data_dir = PathBuf::from(env::var("MAGNET_DATA_DIR").expect("MAGNET_DATA_DIR environment variable must be set"));
-    fs::create_dir_all(data_dir.join("drive")).expect("Failed to create DATA_DIR dirs");
+    fs::create_dir_all(data_dir.join("drive")).expect("Failed to create DATA_DIR/drive");
     data_dir
 });
 

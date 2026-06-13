@@ -12,7 +12,8 @@ use tokio::signal;
 #[derive(Clone)]
 pub struct AppState {
     db: sqlx::PgPool,
-    redis: ConnectionManager,
+    redis_session: ConnectionManager,
+    redis_signup: ConnectionManager,
 }
 
 #[tokio::main]
@@ -30,15 +31,23 @@ async fn main() -> anyhow::Result<()> {
     info!("Connected to PostgreSQL");
 
     let redis_url = env::var("REDIS_URL").context("REDIS_URL must be set in the environment")?;
-    let redis_client = redis::Client::open(redis_url).context("Failed to create Redis client")?;
-    let redis = ConnectionManager::new(redis_client)
+
+    let redis_session_client =
+        redis::Client::open(format!("{}/1", redis_url)).context("Failed to create Redis client")?;
+    let redis_session = ConnectionManager::new(redis_session_client)
+        .await
+        .context("Failed to create Redis connection manager")?;
+    let redis_signup_client =
+        redis::Client::open(format!("{}/1", redis_url)).context("Failed to create Redis client")?;
+    let redis_signup = ConnectionManager::new(redis_signup_client)
         .await
         .context("Failed to create Redis connection manager")?;
     info!("Connected to the Redis");
 
     let state = AppState {
         db: database,
-        redis,
+        redis_session,
+        redis_signup,
     };
 
     let app = urls::router().with_state(state);

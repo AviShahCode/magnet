@@ -12,7 +12,7 @@ pub async fn get(
     if let Some(session) = jar.get("session_id") {
         let _: () = redis::cmd("DEL")
             .arg(session.value())
-            .query_async(&mut state.redis)
+            .query_async(&mut state.redis_session)
             .await
             .or(Err(StatusCode::INTERNAL_SERVER_ERROR))?;
     }

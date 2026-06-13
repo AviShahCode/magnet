@@ -47,13 +47,13 @@ pub(super) async fn post(
     let session_data = serde_json::to_string(&session).unwrap();
 
     // generate session
-    let session_id = utils::auth::generate_hex::<16>();
+    let session_id = utils::auth::generate_base64::<16>();
     let _: () = redis::cmd("SET")
         .arg(&session_id)
         .arg(&session_data)
         .arg("EX")
         .arg(duration)
-        .query_async(&mut state.redis)
+        .query_async(&mut state.redis_session)
         .await
         .or(Err(StatusCode::INTERNAL_SERVER_ERROR))?;
 

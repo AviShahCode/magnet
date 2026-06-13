@@ -12,4 +12,5 @@ pub fn router() -> Router<AppState> {
         .route("/login", post(login::post))
         .route("/whoami", get(whoami::get))
         .route("/logout", get(logout::get))
+        .route("/signup", post(signup::post))
 }

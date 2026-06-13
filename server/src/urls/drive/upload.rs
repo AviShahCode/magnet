@@ -1,7 +1,7 @@
 use crate::AppState;
 use crate::urls::drive::authorize_path;
 use crate::urls::drive::view::ItemType;
-use crate::utils::auth::{generate_hex, get_session};
+use crate::utils::auth::{generate_base64, get_session};
 use crate::utils::global::DATA_DIR;
 use axum::Json;
 use axum::extract::{Path, State};
@@ -54,7 +54,7 @@ pub async fn post(
         }
     }
 
-    let item_id = generate_hex::<16>();
+    let item_id = generate_base64::<16>();
     let item_type;
     match payload.content {
         Some(base64_content) => {
@@ -64,7 +64,7 @@ pub async fn post(
             fs::write(DATA_DIR.join("drive").join(&item_id), content)
                 .await
                 .map_err(|e| {
-                    warn!("Failed to write to file: {}", e);
+                    warn!(target: "drive", "Failed to write to file: {}", e);
                     StatusCode::INTERNAL_SERVER_ERROR
                 })?;
             item_type = ItemType::File;

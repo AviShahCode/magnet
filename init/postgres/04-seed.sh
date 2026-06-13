@@ -6,8 +6,8 @@ set -e
 USERNAME="${MAGNET_ADMIN_USERNAME}"
 PASSWORD="${MAGNET_ADMIN_PASSWORD}"
 
-# Generate an 8-character (4-byte) random hex salt
-SALT=$(od -vN 4 -An -tx1 /dev/urandom | tr -d ' \n')
+# Generate an 8-character (6-byte) random base64 salt
+SALT=$(head -c 6 /dev/urandom | base64)
 
 # Hash password + salt using SHA-256
 # Note: 'echo -n' is critical here so we don't accidentally hash a newline character

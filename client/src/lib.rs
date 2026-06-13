@@ -7,6 +7,8 @@ mod client {
     use serde::Serialize;
 
     #[pymodule_export]
+    use super::admin;
+    #[pymodule_export]
     use super::drive;
 
     // TODO: repetition
@@ -15,9 +17,15 @@ mod client {
         username: String,
         password: String,
     }
+    #[derive(Serialize)]
+    struct SignupRequest {
+        code: String,
+        username: String,
+        password: String,
+    }
 
     #[pyclass]
-    struct Connector {
+    pub struct Connector {
         client: Client,
         #[pyo3(get)]
         base_url: String,
@@ -38,7 +46,7 @@ mod client {
             let url = format!("{}/ping", self.base_url);
             Ok(self
                 .client
-                .get(&self.base_url)
+                .get(url)
                 .send()
                 .expect("error while ping")
                 .status()
@@ -54,13 +62,28 @@ mod client {
                 .json(&payload)
                 .send()
                 .expect("error while login");
-            // println!("{}", self.client.coo);
             Ok(res.status().as_u16())
         }
 
         fn logout(&self) -> PyResult<u16> {
             let url = format!("{}/logout", self.base_url);
             let res = self.client.get(&url).send().expect("error while logout");
+            Ok(res.status().as_u16())
+        }
+
+        fn signup(&self, code: String, username: String, password: String) -> PyResult<u16> {
+            let payload = SignupRequest {
+                code,
+                username,
+                password,
+            };
+            let url = format!("{}/signup", self.base_url);
+            let res = self
+                .client
+                .post(&url)
+                .json(&payload)
+                .send()
+                .expect("error while signup");
             Ok(res.status().as_u16())
         }
 
@@ -71,13 +94,20 @@ mod client {
                 base_url: format!("{}/drive", self.base_url),
             }
         }
+
+        #[getter]
+        fn admin(&self) -> admin::AdminConnector {
+            admin::AdminConnector {
+                client: self.client.clone(),
+                base_url: format!("{}/admin", self.base_url),
+            }
+        }
     }
 }
 
 #[pymodule]
 mod drive {
     use base64::prelude::*;
-    use pyo3::impl_::callback::IntoPyCallbackOutput;
     use pyo3::prelude::*;
     use reqwest::blocking::Client;
     use serde::{Deserialize, Serialize};
@@ -91,9 +121,8 @@ mod drive {
     }
 
     #[pyclass]
-    #[derive(Deserialize, Debug, Clone)]
-    #[derive(PartialEq)]
-pub struct FolderItem {
+    #[derive(Deserialize, Debug, Clone, PartialEq)]
+    pub struct FolderItem {
         #[pyo3(get)]
         id: String,
         #[pyo3(get)]
@@ -219,6 +248,39 @@ pub struct FolderItem {
             let url = format!("{}/{}", self.base_url, path);
             let res = self.client.delete(&url).send().expect("error while delete");
             Ok(res.status().as_u16())
+        }
+    }
+}
+
+#[pymodule]
+mod admin {
+    use pyo3::{PyResult, pyclass, pymethods};
+    use reqwest::blocking::Client;
+
+    #[pyclass]
+    pub struct AdminConnector {
+        pub(crate) client: Client,
+        #[pyo3(get)]
+        pub(crate) base_url: String,
+    }
+
+    #[pymethods]
+    impl AdminConnector {
+        pub fn ping(&self) -> PyResult<u16> {
+            let url = format!("{}/ping", self.base_url);
+            Ok(self
+                .client
+                .get(url)
+                .send()
+                .expect("error while ping")
+                .status()
+                .as_u16())
+        }
+
+        pub fn signup_code(&self) -> PyResult<(u16, String)> {
+            let url = format!("{}/signup_code", self.base_url);
+            let resp = self.client.get(url).send().expect("error while signup code");
+            Ok((resp.status().as_u16(), resp.text().unwrap_or_default()))
         }
     }
 }

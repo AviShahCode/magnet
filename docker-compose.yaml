@@ -47,8 +47,6 @@ services:
       --maxmemory 256mb
       --maxmemory-policy allkeys-lru
       --requirepass ${REDIS_PASSWORD}
-    ports:
-      - "7742:7742"
     networks:
       - magnet_network
     healthcheck:
