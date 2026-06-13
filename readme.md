@@ -159,6 +159,14 @@ All backend services are shielded from the host machine to ensure traffic only f
 | **Magnet** | *Hidden* | The Rust backend. Shielded by APISIX and only communicates internally. |
 | **Redis** | *Hidden* | Ephemeral cache and session storage. |
 
+### APISIX Gateway Features
+
+To optimize performance and protect the backend infrastructure, the APISIX gateway is configured with the following built-in plugins:
+
+- `limit-conn`: Protects the server from being overwhelmed by limiting the number of concurrent connections per client/IP.
+
+- `gzip`: Automatically compresses outgoing HTTP responses to reduce bandwidth usage and improve client-side load times.
+
 ### Enabling Redis Persistence (RDB/AOF)
 
 By default, Redis is configured strictly as a volatile cache with a 256MB memory limit (`--save ""` and `--appendonly no`). It will evict the oldest keys if it gets full, and all data is lost if the container restarts.
